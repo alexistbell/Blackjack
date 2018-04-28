@@ -1,83 +1,81 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title></title>
+	<title>PHP Blackjack</title>
 </head>
 <body>
-    <?php
-        //validate field data here
-        $firstName = $lastName = $email = "";
-        $validForm = false;
+    <?php 
+        include 'deck.php';
+        include 'scoring.php';
 
-        if($_SERVER["REQUEST_METHOD"] == "POST")
-        {
-            if(empty($_POST["firstName"])){
-                $firstName = "A name is required";
-            } else {
-                $firstName = $_POST["firstName"];
-                $validForm = true;
-            }
-
-            if(empty($_POST["lastName"]) && $validForm){
-                $lastName = "A name is required";
-                $validForm = false;
-            } else {
-                $lastName = $_POST["lastName"];
-            }
-
-            if(empty($_POST["email"]) && $validForm){
-                $email = "An email address is required. Yeah we're going to spam you.";
-                $validForm = false;
-            } else {
-                $email = $_POST["email"];
-                if(!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                    $email = "Did you think you'd get away with a fake e-mail?";
-                    $validForm = false;
-                }
-            }
-        }
-
-        //do something if form is valid
-        if($validForm)
-        {
-            addUser($firstName, $lastName, $email);
-
-        }
-
-        function addUser($firstName, $lastName, $email)
-        {
-            $servername = "localhost";
-            $username = "root";
-            $password = "t3cht0n!c";
-            $db = "myDatabase";
-
-            $conn = new mysqli($servername, $username, $password, $db);
-
-            if ($conn->connect_error) {
-                die("Connection failed: " . $conn->connect_error);
-            } 
-
-            $sql = "INSERT INTO users (FirstName,LastName, Email)
-            VALUES ('$firstName', '$lastName', '$email')";
-
-            if($conn->query($sql) === TRUE){
-                echo "New record created";
-            } else{
-                echo "Error: " . $sql . "<br />" . $conn->error;
-            }
-
-            $conn->close();
-
-        }
-
-
+        initDeck();
     ?>
+        <div id = "dealersHand">
+        <h2>Dealer's Hand</h2>
+            <?php 
+                $dealerCardUp = getCard("dealer");
+                echo "<img src =$dealerCardUp->imageSrc data = $dealerCardUp->imageSrc id='dealerCardUp'>";
+                $dealerCardDown = getCard("dealer");
+                $cardBack = "./images/cardBack.png";
+                echo "<img src = $cardBack data = $dealerCardDown->imageSrc id='dealerCardDown'>";
+            ?>           
+            
+    </div>
+    <div id = "playersHand">
+        <h2>Player's Hand</h2>
+            <?php 
+                global $playerCards;
 
-    <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="post">
-        First Name: <input type="text" name="firstName" value = "<?php echo $firstName ?>"><br>
-        Last Name: <input type="text" name="lastName" value = "<?php echo $lastName ?>"><br>
-        E-mail: <input type="text" name="email" value = "<?php echo $email ?>"><br>
-        <input type="submit" value="Create New User">
-    </form>
+                $playerCard1 = getCard("player");
+                echo "<img src =$playerCard1->imageSrc data = $playerCard1->imageSrc id='playerCard1'>";
+                $playerCard2 = getCard("player");
+                echo "<img src =$playerCard2->imageSrc data = $playerCard2->imageSrc id='playerCard2'>";
+            ?>           
+    </div>
+
+    <div id = "winner">
+        <?php 
+            function checkGameState($lastMove)
+            {
+                $gameState = checkForWinner();
+                switch ($gameState){
+                    case "Dealer wins!":
+                        echo gameOver();
+                        break;
+                    case "Player wins!":
+                        echo gameOver();
+                        break;
+                    default:
+                        break;
+                }
+
+                if($lastMove === "hit" && $gameState === "No winner yet"){
+                    echo "<p>Player hit</p>";
+                    echo dealersTurn();
+                }
+                return $gameState;
+            }
+
+            echo checkGameState("startGame");
+        ?>
+    </div>
+    <button type = "button" id="hit">Hit</button><button type = "button" id="stand">Stand</button>
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+    <script type = "text/javascript" src = "script.js"></script>
+    <script type = "text/javascript" src = "card.js"></script>
+
 </body>
 </html>
+
+<!-- <?php 
+    if(in_array('do', $_GET))
+    {
+        if($_GET['do'] === "hit"){
+            $post_data = checkGameState("hit");
+            echo $post_data;
+        }
+    }
+?> -->
