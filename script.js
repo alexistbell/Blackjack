@@ -13,7 +13,7 @@ var CardGame;
 
 CardGame.prototype.getCard = function() {
     $.ajax({
-        url:'drawCard.php?do=getJsonCard',
+        url:'ajax.php?do=getJsonCard',
         complete: function(response) {
             console.log(response.responseJSON);
             var imageSrc = response.responseJSON.image_src;
@@ -28,7 +28,7 @@ CardGame.prototype.getCard = function() {
 
 CardGame.prototype.playerHit = function(){
     $.ajax({
-        url:'drawCard.php?do=hit',
+        url:'ajax.php?do=hit',
         complete: function(response) {
             console.log(response);
         },
